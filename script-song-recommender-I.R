@@ -68,4 +68,44 @@ ref_song <- playlist_songs_clean %>%
     filter(artist_name == "Niqo Nuevo" & track_name == "Ocean") 
 
 ref_song_id <- ref_song %>% pull(track_id)
+
+# Move "Reference" Song to Bottom of Dataset ----
+prepared_tbl <- playlist_songs_clean %>% 
+    filter(track_id != ref_song_id) %>% 
+    rbind(ref_song) 
+
+prepared_tbl %>% tail()
+
+# Get Track Name & Track Title ----
+prepared_tbl_track_name <- prepared_tbl %>% 
+    select(track_id, track_name, artist_name)
+
+# Get Numeric Features ----
+prepared_tbl_numeric <- prepared_tbl %>% 
+    select_if(is.numeric) %>% 
+    select(-track_id)
+
+# Scale Numeric Features ----
+set.seed(100)
+prepared_tbl_scaled <- prepared_tbl_numeric %>% 
+    mutate_all(., ~ (scale(., center = TRUE) %>% as.vector))
+    
+
+# Calculate Euclidean Distance From Reference Song
+set.seed(200)
+prepared_tbl_scaled$distance <- 
+    as.matrix(dist(prepared_tbl_scaled))[nrow(prepared_tbl_scaled),]
+
+prepared_tbl_scaled %>% tail()
+
+prepared_tbl_dist <- prepared_tbl_track_name %>% 
+    bind_cols(prepared_tbl_scaled) %>% 
+    filter(track_id != ref_song_id)
+
+prepared_tbl_dist %>% tail()
+
+
+prepared_tbl_dist %>% 
+    arrange(distance) %>% 
+    slice(1:10)
     
