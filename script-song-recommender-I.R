@@ -13,7 +13,7 @@ get_spotify_authorization_code(
 
 # Get Playlist URL ----
 playlist_username <- playlist_username # <- Your Spotify username
-playlist_url      <- url # <- The playlist url
+playlist_url      <- url # <- Your playlist url
 
 
 # Get Playlist Details ----
@@ -21,8 +21,6 @@ playlist_raw <- get_playlist_audio_features(
     playlist_username,
     url
 ) 
-
-
 
 # Create Numeric Values for Key Name, Mode Name and Key Mode
 key_name_tbl <- playlist_raw %>% 
@@ -39,7 +37,6 @@ key_mode_tbl <- playlist_raw %>%
     distinct(key_mode) %>% 
     rowid_to_column() %>% 
     rename(key_mode_id = rowid)
-
 
 
 # Final Dataframe
@@ -65,7 +62,6 @@ playlist_clean_tbl <- playlist_raw %>%
     setNames(names(.) %>% str_replace_all("\\.", "_"))
 
 
-
 # Select "Reference" Song ----
 ref_song <- playlist_clean_tbl %>% 
     filter(artist_name == "Niqo Nuevo" & track_name == "Ocean") 
@@ -80,7 +76,6 @@ prepared_tbl <- playlist_clean_tbl %>%
 
 prepared_tbl %>% tail()
 
-# prepared_tbl %>% write_rds(file = "prepared_tbl.rds")
 
 # Get Track Name & Track Title ----
 prepared_tbl_track_name <- prepared_tbl %>% 
@@ -101,7 +96,6 @@ distance_tbl <- as.matrix(dist(prepared_tbl_scaled))[nrow(prepared_tbl_scaled),]
 
 distance_tbl %>% tail()
 
-# distance_tbl %>% write_rds(file = "distance.rds")
 
 # Combine Distance, Artist Name/Track Name & Scaled Features ----
 prepared_tbl_dist <- prepared_tbl_track_name %>% 
@@ -111,8 +105,6 @@ prepared_tbl_dist <- prepared_tbl_track_name %>%
     rename(distance = value)
 
 prepared_tbl_dist %>% tail()
-
-# prepared_tbl_dist %>% write_rds(file = "prepared_tbl_dist.rds")
 
 
 # Combine Distance, Artist Name/Track Name & Scaled Features ----
