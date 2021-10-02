@@ -1,0 +1,40 @@
+---
+title: "Song Recommender Shiny App"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+
+library(tidyverse)
+```
+
+```{r}
+# Load Data
+```
+
+row {data-height=200}
+--------------------------------------------------------------------------------
+
+```{r}
+  selectInput(
+      
+      "select", label = h4("Select box"), 
+    choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3), 
+    selected = 1)
+```
+
+row {data-height=500}
+--------------------------------------------------------------------------------
+
+### Song Details
+
+```{r, echo=FALSE, out.extra=c('allow="encrypted-media"', 'allowtransparency="true"', 'frameBorder="0"')}
+knitr::include_url("https://open.spotify.com/embed/track/4cdCogh8cRhDLcPiHx6HXC", height = "80")
+```
+
