@@ -10,31 +10,74 @@ runtime: shiny
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(shiny)
+library(shinyWidgets)
 
 library(tidyverse)
+
+source("script_functions.R")
 ```
 
 ```{r}
 # Load Data
+songs_tbl <- readRDS("../Data/prepared_tbl.rds")
+
+# Track IDs For Reference Songs
+set.seed(100)
+rand_ids <- sample(1:451, 20, replace=FALSE)
+
+songs_tbl <- songs_tbl %>% 
+  mutate(ref_song = ifelse(track_id %in% rand_ids, "Yes", "No")) %>% 
+  mutate(track_artist = paste(track_name, artist_name, sep = " - "))
+
+
+
+.track_artist <- "Don't Trust Geminis - Bella Alubo"
 ```
 
-row {data-height=200}
+Sidebar {.sidebar}
 --------------------------------------------------------------------------------
 
 ```{r}
-  selectInput(
-      
-      "select", label = h4("Select box"), 
-    choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3), 
-    selected = 1)
+selectInput(inputId  = "ref_song_select",
+            label    = h4("Select Reference Song"), 
+            choices  = songs_tbl[songs_tbl$ref_song == "Yes",]$track_artist,
+            selected = songs_tbl[songs_tbl$ref_song == "Yes",]$track_artist[1]
+            )
+
+
+br()
+hr()
+br()
+
+actionButton(inputId = "apply", label   = "Apply", icon    = icon(name = "play", lib = "glyphicon"))
+
+
+track_artist <- eventReactive(eventExpr = input$apply, valueExpr = {
+  songs_tbl %>% 
+    filter(track_artist == input$ref_song_select) %>% 
+    pull(track_external_urls_spotify) %>% 
+    str_replace_all("track", "embed/track")
+})
+
+txt <- renderPrint(track_artist())
+                
 ```
+
 
 row {data-height=500}
 --------------------------------------------------------------------------------
 
-### Song Details
+### Reference Song 
 
 ```{r, echo=FALSE, out.extra=c('allow="encrypted-media"', 'allowtransparency="true"', 'frameBorder="0"')}
-knitr::include_url("https://open.spotify.com/embed/track/4cdCogh8cRhDLcPiHx6HXC", height = "80")
+knitr::include_url(txt, height = "80")
 ```
+
+
+```{r}
+renderPrint(track_artist())
+```
+
+
+
 
