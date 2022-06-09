@@ -17,8 +17,8 @@ get_spotify_authorization_code(
 
 
 # Get Playlist URL ----
-playlist_username  <- "Chuky Okwudishu"
-playlist_uris      <- "1HEXLSeXmQ3A87QMC6Liew"
+playlist_username  <- playlist_username  
+playlist_uris      <- playlist_uris
 
 
 # Get Playlist Details ----
@@ -31,7 +31,7 @@ audio_features_raw_tbl <- get_playlist_audio_features(
 
 
 # Save Raw Data ----
-audio_features_raw_tbl %>% write_rds("../Data/audo_features_raw_tbl.rds")
+audio_features_raw_tbl %>% write_rds("../Data/audio_features_raw_tbl.rds")
 
 
 audio_features_raw_tbl %>% glimpse()
