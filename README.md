@@ -1,4 +1,4 @@
-# Spotify-Song-Recommender-I
+# Spotify Song Recommender
 
 ## A minimalist approach to a Spotify song recommender system
 
