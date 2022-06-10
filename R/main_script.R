@@ -17,8 +17,8 @@ get_spotify_authorization_code(
 
 
 # Get Playlist URL ----
-playlist_username  <- playlist_username  
-playlist_uris      <- playlist_uris
+playlist_username  <- playlist_username  # your spotify username
+playlist_uris      <- playlist_uris # your spotify playlist url
 
 
 # Get Playlist Details ----
@@ -225,14 +225,14 @@ get_closest_songs(
     data = prepared_tbl,
     ref_song_artist = "Niqo Nuevo",
     ref_song_title = "Ocean",
-    adj_tempo = TRUE
+    adj_tempo = FALSE
 )
 
 get_closest_songs(
     data = prepared_tbl,
     ref_song_artist = "Emily Normann",
     ref_song_title = "Sans détour",
-    adj_tempo = TRUE
+    adj_tempo = FALSE
 )
 
 get_closest_songs(
