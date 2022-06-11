@@ -16,5 +16,5 @@ Evaluating results in the project was subjective and based on how I hear music. 
 * Spotifyr
 
 ## Helpful Resources
-* [Spotifyr](https://www.rcharlie.com/spotifyr/).
-* [Discover Spotify's Features](https://developer.spotify.com/discover/).
+* [Spotifyr](https://www.rcharlie.com/spotifyr/)
+* [Discover Spotify's Features](https://developer.spotify.com/discover/)
