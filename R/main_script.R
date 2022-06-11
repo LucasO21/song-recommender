@@ -33,7 +33,6 @@ audio_features_raw_tbl <- get_playlist_audio_features(
 # Save Raw Data ----
 audio_features_raw_tbl %>% write_rds("../Data/audio_features_raw_tbl.rds")
 
-
 audio_features_raw_tbl %>% glimpse()
 audio_features_raw_tbl %>% distinct(key_name) 
 audio_features_raw_tbl %>% distinct(mode_name) 
@@ -80,9 +79,16 @@ audio_features_clean_tbl <- audio_features_raw_tbl %>%
     select(-c(key_name, mode_name, key_mode)) %>% 
     rowid_to_column()
 
+
 # Save Audio Features Clean ----
+# - Save data so as not to request data from API next time I open the project
 audio_features_clean_tbl %>% write_rds("../Data/audio_features_clean_tbl")
-    
+
+# ******************************************************************************
+
+# Load Clean Audio Features Data ----
+audio_features_clean_tbl <- read_rds("../Data/audio_features_clean_tbl")
+
 
 # Select "Reference" Song ----
 ref_song <- audio_features_clean_tbl %>% 
@@ -112,6 +118,9 @@ audio_features_tbl <- prepared_tbl %>%
 audio_features_scaled_tbl <- audio_features_tbl %>% 
     mutate_all(., ~ (scale(., center = TRUE) %>% as.vector))
 
+# Save Scaled Features ----
+# audio_features_scaled_tbl %>% write_rds("../Data/audio_features_scaled_tbl.rds")
+
 
 # Calculate Euclidean Distance From Reference Song ----
 distance_tbl <- as.matrix(dist(audio_features_scaled_tbl))[nrow(audio_features_scaled_tbl),] %>% 
@@ -119,7 +128,7 @@ distance_tbl <- as.matrix(dist(audio_features_scaled_tbl))[nrow(audio_features_s
 
 
 # Save Distance Dataframe ----
-distance_tbl %>% write_rds("../Data/distance_tbl.rds")
+# distance_tbl %>% write_rds("../Data/distance_tbl.rds")
 
 
 # Combine Distance, Artist Name/Track Name & Scaled Features ----
@@ -129,8 +138,8 @@ combined_tbl <- track_artist_tbl %>%
     #filter(! rowid == ref_song_id) %>% 
     rename(distance = value)
 
-combined_tbl %>% write_rds("../Data/combined_tbl.rds")
-
+# Save Combined Dataframe ----
+# combined_tbl %>% write_rds("../Data/combined_tbl.rds")
 
 # Analyze Results ----
 combined_tbl %>% 
@@ -139,13 +148,6 @@ combined_tbl %>%
     
 
 # Experimentation Function ----
-combined_tbl %>% 
-        filter(tempo %>% between(80, 83)) %>% 
-        arrange(distance)
-
-
-ref_song_id <- 527 
-
 get_closest_songs <- function(data, ref_song_artist, ref_song_title,
                               adj_tempo = FALSE, tempo_int = 2){
     
@@ -221,25 +223,81 @@ get_closest_songs <- function(data, ref_song_artist, ref_song_title,
     
 }
 
-get_closest_songs(
+# Version 2 ----
+version2_tbl <- get_closest_songs(
     data = prepared_tbl,
     ref_song_artist = "Niqo Nuevo",
     ref_song_title = "Ocean",
-    adj_tempo = FALSE
+    adj_tempo = TRUE
+) 
+
+version2_tbl %>% write_rds("../Artifacts/version2_tbl.rds") 
+
+
+# Version 3 ----
+version3_tbl <- get_closest_songs(
+    data = prepared_tbl %>% select(-c(loudness, liveness, valence)),
+    ref_song_artist = "Niqo Nuevo",
+    ref_song_title = "Ocean",
+    adj_tempo = TRUE
 )
 
-get_closest_songs(
-    data = prepared_tbl,
+version3_tbl %>% write_rds("../Artifacts/version3_tbl.rds") 
+
+
+# Version 4 ----
+version4_tbl <- get_closest_songs(
+    data = prepared_tbl %>% filter(! artist_name == "Kewin Cosmos"),
     ref_song_artist = "Emily Normann",
     ref_song_title = "Sans détour",
     adj_tempo = FALSE
 )
 
-get_closest_songs(
-    data = prepared_tbl,
-    ref_song_artist = "TENDER",
-    ref_song_title = "Volatile",
+version4_tbl %>% write_rds("../Artifacts/version4_tbl.rds") 
+
+
+# Version 5 ----
+version5_tbl <- get_closest_songs(
+    data = prepared_tbl %>% filter(! artist_name == "Kewin Cosmos"),
+    ref_song_artist = "2Scratch",
+    ref_song_title = "FROZEN",
     adj_tempo = TRUE
 )
+
+version5_tbl %>% write_rds("../Artifacts/version5_tbl.rds") 
+
+# ******************************************************************************
+# Spotify Embed Function (For Blog Article) ----
+# audio_features_raw2_tbl <- audio_features_raw_tbl %>% 
+#     select(track_name, track_artists, danceability:tempo, key_name:key_mode,
+#            track_id) %>% 
+#     mutate(artist_name = map_chr(track_artists, function(x) x$name[1])) %>% 
+#     select(-track_artists) %>% 
+#     select(track_name, artist_name, everything(.))
+# 
+# audio_features_raw2_tbl %>% glimpse()
+# audio_features_raw2_tbl %>% write_rds("../Data/audio_features_raw2_tbl.rds")
+# 
+# embed_song <- function(data, song_position = 2){
+#     
+#     concat <- data %>% 
+#         mutate(concat_id = paste0(track_name, artist_name)) %>% 
+#         slice(song_position) %>% 
+#         pull(concat_id)
+#     
+#     track_id <- audio_features_raw2_tbl %>% 
+#         select(track_name, artist_name, track_id) %>% 
+#         mutate(concat_id = paste0(track_name, artist_name)) %>% 
+#         filter(concat_id == concat) %>% 
+#         pull(track_id)
+#     
+#     url = paste0("https://open.spotify.com/embed/track/", track_id)
+#     
+#     embed_url <- knitr::include_url(
+#         url, height = "80"
+#     )
+#     
+#     return(embed_url)   
+# }
 
 
